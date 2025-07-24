@@ -3,6 +3,7 @@
 #import "@preview/linkify:0.1.0"
 #import linkify.display: bili
 
+#set par(justify: true)
 #set text(font: "New Computer Modern")
 #show raw: set text(font: "New Computer Modern Mono", size: 10pt)
 #show: custom-bib-refs
@@ -63,6 +64,6 @@ _How to Become a Human_ is a series of videos by #bili(..wagner) from Bilibili. 
     ]
   },
   // backref: false,
-  debug: true,
+  // debug: true,
 )
 

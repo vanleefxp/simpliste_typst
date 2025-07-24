@@ -37,9 +37,9 @@
       named: true,
     ),
     e.field(
-      "backref-indent",
-      length,
-      default: 0.5em,
+      "backref-prefix",
+      e.types.option(e.types.union(content, str, symbol, dictionary)),
+      default: (inline: h(0.125em), block: h(1fr)),
       named: false,
     ),
     e.field(
@@ -51,10 +51,13 @@
   ),
   allow-unknown-fields: true,
   display: el => {
-    let ((body, block, separator, backref, backref-indent, backref-sep), args) = dict-sep(
+    let ((body, block, separator, backref, backref-prefix, backref-sep), args) = dict-sep(
       e.fields(el),
-      "body", "block", "separator", "backref", "backref-indent", "backref-sep"
+      "body", "block", "separator", "backref", "backref-prefix", "backref-sep"
     )
+    if type(backref-prefix) == dictionary {
+      backref-prefix = if block { backref-prefix.block } else { backref-prefix.inline }
+    }
     assert.eq(body.func(), sequence)
     let (bib-number-args, args) = dict-sep(args, "numbering")
 
@@ -77,7 +80,7 @@
                 .final()
                 .at(str(label), default: 0)
               if backref-count > 0 {
-                h(backref-indent)
+                backref-prefix
                 range(backref-count)
                   .map(i => bib-backref(label, i))
                   .join(backref-sep)
@@ -204,9 +207,9 @@
       named: true,
     ),
     e.field(
-      "backref-indent",
-      length,
-      default: 0.5em,
+      "backref-prefix",
+      e.types.option(e.types.union(content, str, symbol)),
+      default: h(1fr),
       named: false,
     ),
     e.field(
@@ -224,7 +227,7 @@
   ),
   allow-unknown-fields: true,
   display: el => {
-    let (body, align, number-align, body-indent, column-gutter, backref, backref-indent, backref-sep, debug) = e.fields(el)
+    let (body, align, number-align, body-indent, column-gutter, backref, backref-prefix, backref-sep, debug) = e.fields(el)
     assert.eq(body.func(), sequence)
     let terms-items = body.children.filter(
       it => (
@@ -250,22 +253,22 @@
       for (i, label) in labels.enumerate()  {
         let backref-count = backref-counts.at(str(label), default: 0)
         if backref-count > 0 {
-          has-backref-col = true
           let backref-content = range(backref-count)
             .map(j => bib-backref(label, j))
             .join(backref-sep)
           let last-line = items.at(i).pop()
           if last-line.is-columns {
+            has-backref-col = true
             last-line.contents.push(
               grid.cell(
-                backref-content,
-                align: end,
+                backref-prefix + backref-content,
+                // align: end,
                 colspan: 2,
               )
             )
             backref-col-min-width = calc.max(measure(backref-content).width, backref-col-min-width)
           } else {
-            last-line.contents.push(h(backref-indent))
+            last-line.contents.push(backref-prefix)
             last-line.contents.push(backref-content)
           }
           items.at(i).push(last-line)

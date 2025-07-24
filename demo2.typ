@@ -4,6 +4,8 @@
 
 #show: custom-bib-refs
 #set par(justify: true)
+#set text(font: "New Computer Modern")
+#show raw: set text(font: "New Computer Modern Mono", size: 10pt)
 #show: e.show_(
   inline-list,
   it => {
@@ -11,6 +13,15 @@
     set list(body-indent: 0.125em)
     it
   },
+)
+#show: e.show_(
+  bib-fox.ref.bib-backref,
+  it => {
+    // use math font for the backref arrow symbol
+    // The symbol is missing in text font
+    set text(font: "New Computer Modern Math")
+    it
+  }
 )
 
 lorem ipsum@bib2 dolor@bib1 sit@bib6 amet@c #lorem(10)@bib1 #lorem(20)@bib5@bib11
@@ -20,22 +31,21 @@ lorem ipsum@bib2 dolor@bib1 sit@bib6 amet@c #lorem(10)@bib1 #lorem(20)@bib5@bib1
 == Bibliography
 
 #bib-list(block: true)[
-  / bib1: Lorem
-  / bib2: Ipsum
-  / bib3: Dolor
-
-  / bib4: Sit
-  / bib5: Amet
+  / bib1: #lorem(20)
+  / bib2: #lorem(30)
+  / bib3: #lorem(10)
+  / bib4: #lorem(15)
+  / bib5: #lorem(50)
 ]
 
 Something
 
 #bib-list(block: true)[
-  / bib6: Lorem
-  / bib7: Ipsum
-  / bib8: Dolor
-  / bib9: Sit
-  / bib10: Amet
+  / bib6: #lorem(5)
+  / bib7: #lorem(10)
+  / bib8: #lorem(10)
+  / bib9: #lorem(15)
+  / bib10: #lorem(5)
 ]
 
 Something: #bib-list(block: false)[
