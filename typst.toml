@@ -1,0 +1,7 @@
+[package]
+name = "bib-fox"
+version = "0.1.0"
+entrypoint = "src/lib.typ"
+authors = ["F.X.P."]
+license = "MIT"
+description = "Create customized bibliography display style as an alternative to Typst' s builtin `bibliography` function."
