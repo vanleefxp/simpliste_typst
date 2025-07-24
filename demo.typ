@@ -63,5 +63,6 @@ _How to Become a Human_ is a series of videos by #bili(..wagner) from Bilibili. 
     ]
   },
   // backref: false,
+  debug: true,
 )
 

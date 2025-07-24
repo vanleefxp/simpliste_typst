@@ -2,6 +2,7 @@
 #import "./ref.typ": st_ref-labels, st_backrefs, bib-number, bib-ref-number, bib-backref
 #import "./list.typ": inline-list
 #import "./utils.typ": dict-sep, is-empty-content
+#import "./init.typ": debug-box-stroke
 
 #let space = [ ].func()
 #let sequence = [a *b*].func()
@@ -214,10 +215,16 @@
       default: h(0.125em),
       named: false,
     ),
+    e.field(
+      "debug",
+      bool,
+      default: false,
+      named: true
+    )
   ),
   allow-unknown-fields: true,
   display: el => {
-    let (body, align, number-align, body-indent, column-gutter, backref, backref-indent, backref-sep) = e.fields(el)
+    let (body, align, number-align, body-indent, column-gutter, backref, backref-indent, backref-sep, debug) = e.fields(el)
     assert.eq(body.func(), sequence)
     let terms-items = body.children.filter(
       it => (
@@ -236,19 +243,31 @@
       }
     })
 
+    let has-backref-col = false
+    let backref-col-min-width = 0pt
     if backref {
       let backref-counts = st_backrefs.final()
       for (i, label) in labels.enumerate()  {
         let backref-count = backref-counts.at(str(label), default: 0)
         if backref-count > 0 {
+          has-backref-col = true
           let backref-content = range(backref-count)
             .map(j => bib-backref(label, j))
             .join(backref-sep)
           let last-line = items.at(i).pop()
-          if not last-line.is-columns {
+          if last-line.is-columns {
+            last-line.contents.push(
+              grid.cell(
+                backref-content,
+                align: end,
+                colspan: 2,
+              )
+            )
+            backref-col-min-width = calc.max(measure(backref-content).width, backref-col-min-width)
+          } else {
             last-line.contents.push(h(backref-indent))
+            last-line.contents.push(backref-content)
           }
-          last-line.contents.push(backref-content)
           items.at(i).push(last-line)
         }
       }
@@ -273,10 +292,10 @@
           cells += line.contents
           let line-n-columns = line.contents.len()
           if line-n-columns < n-columns {
-            cells += ([],) * (n-columns - line-n-columns)
+            cells += ([],) * (n-columns - line-n-columns + if has-backref-col { 1 } else { 0 })
           }
         } else {
-          cells.push(grid.cell(line.contents.join(), colspan: n-columns))
+          cells.push(grid.cell(line.contents.join(), colspan: if has-backref-col { 1 } else { 0 } + n-columns))
         }
       }
     }
@@ -291,9 +310,13 @@
 
     grid(
       ..cells,
-      columns: (auto,) * (n-columns + 1),
+      columns: if has-backref-col {
+        (auto,) * n-columns + (1fr, backref-col-min-width)
+      } else {
+        (auto,) * (n-columns + 1)
+      },
       row-gutter: par.leading,
-      column-gutter: (body-indent,) + column-gutter,
+      column-gutter: (body-indent,) + column-gutter + (0pt,),
       align: (i, j) => {
         if (i == 0) { number-align } else {
           if type(align) == function {
@@ -304,7 +327,8 @@
             align
           }
         }
-      }
+      },
+      stroke: if debug { debug-box-stroke },
     )
   },
   doc: "A multi-column version of `bib-list`. Displays nicely-aligned information of bibliography items in multiple columns.",
