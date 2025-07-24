@@ -7,6 +7,7 @@
 ) = {
   assert.eq(type(display), function, message: "A data display function must be specified. It should be a function that takes an entry's data as input argument")
   let data = args.pos()
+  let kwargs = args.named()
   let fn = if kind == "list" { bib-list } else { bib-entries }
   fn(
     for entry-data in data {
@@ -17,6 +18,7 @@
       }
       assert.eq(type(label), str)
       terms.item(label, display(entry-data))
-    }
+    },
+    ..kwargs,
   )
 }

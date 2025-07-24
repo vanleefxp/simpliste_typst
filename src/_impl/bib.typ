@@ -195,11 +195,29 @@
       e.types.union(length, e.types.array(length)),
       named: true,
       default: 1em,
-    )
+    ),
+    e.field(
+      "backref",
+      bool,
+      default: true,
+      named: true,
+    ),
+    e.field(
+      "backref-indent",
+      length,
+      default: 0.5em,
+      named: false,
+    ),
+    e.field(
+      "backref-sep",
+      e.types.option(e.types.union(str, content, symbol)),
+      default: h(0.125em),
+      named: false,
+    ),
   ),
   allow-unknown-fields: true,
   display: el => {
-    let (body, align, number-align, body-indent, column-gutter) = el
+    let (body, align, number-align, body-indent, column-gutter, backref, backref-indent, backref-sep) = e.fields(el)
     assert.eq(body.func(), sequence)
     let terms-items = body.children.filter(
       it => (
@@ -218,12 +236,30 @@
       }
     })
 
+    if backref {
+      let backref-counts = st_backrefs.final()
+      for (i, label) in labels.enumerate()  {
+        let backref-count = backref-counts.at(str(label), default: 0)
+        if backref-count > 0 {
+          let backref-content = range(backref-count)
+            .map(j => bib-backref(label, j))
+            .join(backref-sep)
+          let last-line = items.at(i).pop()
+          if not last-line.is-columns {
+            last-line.contents.push(h(backref-indent))
+          }
+          last-line.contents.push(backref-content)
+          items.at(i).push(last-line)
+        }
+      }
+    }
+
     let n-columns = calc.max(
       ..items
         .join()
         .filter(((is-columns,)) => is-columns)
         .map(((contents,)) => contents.len()),
-      1
+      1 // ensure there is at least one item
     )
 
     let cells = ()

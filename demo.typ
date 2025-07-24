@@ -1,12 +1,23 @@
 #import "./src/lib.typ" as bib-fox: custom-bib-refs, bib-from-data
-#import "@preview/linkify:0.1.0"
 #import "@preview/elembic:1.1.1" as e
+#import "@preview/linkify:0.1.0"
 #import linkify.display: bili
 
+#set text(font: "New Computer Modern")
+#show raw: set text(font: "New Computer Modern Mono", size: 10pt)
 #show: custom-bib-refs
 #show: e.show_(
-  bib-fox.bib-ref-number,
+  bib-fox.ref.bib-ref-number,
   super,
+)
+#show: e.show_(
+  bib-fox.ref.bib-backref,
+  it => {
+    // use math font for the backref arrow symbol
+    // The symbol is missing in text font
+    set text(font: "New Computer Modern Math")
+    it
+  }
 )
 
 #let wagner = arguments(uid: 434773406, "sheepherder_wagner")
@@ -51,4 +62,6 @@ _How to Become a Human_ is a series of videos by #bili(..wagner) from Bilibili. 
       - by #bili(..author)
     ]
   },
+  // backref: false,
 )
+

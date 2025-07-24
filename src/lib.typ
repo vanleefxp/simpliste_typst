@@ -3,10 +3,8 @@
   bib-entries,
 )
 
-#import "_impl/ref.typ": (
+#import "ref.typ" as ref: (
   custom-bib-refs,
-  bib-number,
-  bib-ref-number
 )
 
 #import "_impl/generate.typ": (
