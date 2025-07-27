@@ -142,7 +142,7 @@
       named: true,
     ),
     e.field(
-      "term-column-width",
+      "hanging-indent",
       e.types.smart(e.types.union(length, ratio)),
       default: auto,
       named: true,
@@ -160,7 +160,7 @@
       body,
       body-indent,
       term-align,
-      term-column-width,
+      hanging-indent,
       separator,
       debug
     ) = e.fields(el)
@@ -183,23 +183,23 @@
           descs.push(desc)
         }
 
-        let term-column-width = if type(term-column-width) == ratio {
-          width * term-column-width
-        } else if term-column-width == auto {
+        let hanging-indent = if type(hanging-indent) == ratio {
+          width * hanging-indent
+        } else if hanging-indent == auto {
           calc.max(..term-widths)
         } else {
-          assert.eq(type(term-column-width), length)
-          term-column-width.to-absolute()
+          assert.eq(type(hanging-indent), length)
+          hanging-indent.to-absolute()
         }
 
         let result = for (term, desc, term-width) in terms.zip(descs, term-widths) {
-          let extra-width = term-width -term-column-width
+          let extra-width = term-width - hanging-indent
           cells.push(
             box(term, width: width)
           )
           cells.push(
             if extra-width > 0pt { h(extra-width) } +
-            it.separator +
+            separator +
             desc
           )
         }
@@ -207,7 +207,7 @@
         grid(
           ..cells,
           column-gutter: body-indent,
-          columns: (term-column-width, 1fr),
+          columns: (hanging-indent, 1fr),
           row-gutter: if (it.tight) {
             par.leading
           } else {
@@ -223,4 +223,8 @@
   }
 )
 
+#show terms: aligned-terms.with(hanging-indent: 4em)
 
+/ Ligature: A merged glyph.
+/ Kerning: A spacing adjustment between two adjacent letters.
+/ Character Advance: The size of the character in the direction the text flows, which refers to the character width in horizontal writing mode, and character hight in vertical writing mode.
