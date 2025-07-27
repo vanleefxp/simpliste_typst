@@ -8,8 +8,7 @@
 #let mod = calc.rem-euclid
 
 #let st_ref-labels = state("simpliste.bib.ref-labels", (:))
-#let st_backrefs = state("simpliste.bib.backrefs", (:))
-#let backref-prefix = "__bibfox.backref"
+#let backref-counter-name-prefix = "__simpliste.backref"
 
 #let bib-number = e.element.declare(
   "bib-number",
@@ -52,14 +51,15 @@
     if type(target) == str {
       target = label(target)
     }
-    let backref-count = st_backrefs.get().at(str(target), default: 0)
-    st_backrefs.update(value => {
-      value.insert(str(target), backref-count + 1)
-      value
-    })
+    let backref-counter = counter(backref-counter-name-prefix + "_" + str(target))
+    let backref-count = backref-counter.get().at(0)
+
     let backref-label = std.label(
-      backref-prefix + "_" + str(target) + "_" + str(backref-count)
+      "__simpliste.backref" + "_" + str(target) + "_" + str(backref-count)
     )
+
+    backref-counter.step()
+
     [#link(
       target,
       std.numbering(numbering, ..e.counter(bib-number).at(target))
@@ -97,7 +97,7 @@
     if type(target) == label {
       target = str(target)
     }
-    let label = std.label(backref-prefix + "_" + target + "_" + str(index))
+    let label = std.label("__simpliste.backref" + "_" + target + "_" + str(index))
     link(label, mark)
   },
 )
@@ -182,9 +182,7 @@
           {
             terms-item.description
             if backref {
-              let backref-count = st_backrefs
-                .final()
-                .at(str(label), default: 0)
+              let backref-count = counter(backref-counter-name-prefix + "_" + str(label)).get().at(0)
               if backref-count > 0 {
                 backref-prefix
                 range(backref-count)
@@ -355,9 +353,8 @@
     let has-backref-col = false
     let backref-col-min-width = 0pt
     if backref {
-      let backref-counts = st_backrefs.final()
       for (i, label) in labels.enumerate()  {
-        let backref-count = backref-counts.at(str(label), default: 0)
+        let backref-count = counter("__bib-" + "_" + str(label)).get().at(0)
         if backref-count > 0 {
           let backref-content = range(backref-count)
             .map(j => bib-backref(label, j))
