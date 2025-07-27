@@ -1,4 +1,5 @@
-#import "./src/lib.typ" as bib-fox: custom-bib-refs, bib-from-data
+#import "./src/lib.typ" as simpliste
+#import simpliste.bib: custom-bib-refs, bib-from-data
 #import "@preview/elembic:1.1.1" as e
 #import "@preview/linkify:0.1.0"
 #import linkify.display: bili
@@ -8,11 +9,11 @@
 #show raw: set text(font: "New Computer Modern Mono", size: 10pt)
 #show: custom-bib-refs
 #show: e.show_(
-  bib-fox.ref.bib-ref-number,
+  simpliste.bib.bib-ref-number,
   super,
 )
 #show: e.show_(
-  bib-fox.ref.bib-backref,
+  simpliste.bib.bib-backref,
   it => {
     // use math font for the backref arrow symbol
     // The symbol is missing in text font

@@ -19,11 +19,12 @@
 // (Check https://gist.github.com/PgBiel/c530ae8ac937469510ab382e03a6ba2b for the latest version)
 
 #import "@preview/elembic:1.1.1" as e
-#import "./utils.typ": dict-sep
+#import "./init.typ": debug-box-stroke
+#import "./utils.typ": dict-sep, transpose, is-multi-line
 
 #let inline-list = e.element.declare(
   "inline-list",
-  prefix: "bib-fox.list",
+  prefix: "simpliste.list",
   fields: (
     e.field(
       "body",
@@ -41,7 +42,7 @@
   display: el => {
     let (body, separator) = e.fields(el)
 
-    let enum-number = state("bib-fox.list.enum-number")
+    let enum-number = state("simpliste.list.enum-number")
     show enum: it => context {
       let prev = enum-number.get()
 
@@ -71,7 +72,7 @@
       items.join(separator)
     }
 
-    let list-level = counter("bib-fox.list.list-level")
+    let list-level = counter("simpliste.list.list-level")
     show list: it => list-level.step() + context {
       let marker = [#if type(it.marker) == array {
         // Only read the level if necessary
@@ -93,3 +94,133 @@
     body
   }
 )
+
+#let aligned-term = e.element.declare(
+  "aligned-term",
+  prefix: "simpliste.list",
+  fields: (
+    e.field(
+      "body",
+      e.types.option(e.types.union(content, str, symbol)),
+      named: false,
+      required: true,
+    ),
+  ),
+  allow-unknown-fields: true,
+  display: el => {
+    let (body,) = el
+    strong(body)
+  }
+)
+
+#let aligned-terms = e.element.declare(
+  "aligned-terms",
+  prefix: "simpliste.list",
+  fields: (
+    e.field(
+      "body",
+      e.types.option(e.types.union(content, str, symbol)),
+      named: false,
+      required: true,
+    ),
+    e.field(
+      "body-indent",
+      e.types.smart(length),
+      default: 1em,
+      named: true,
+    ),
+    e.field(
+      "separator",
+      e.types.option(e.types.union(content, str)),
+      default: none,
+      named: true,
+    ),
+    e.field(
+      "term-align",
+      e.types.smart(alignment),
+      default: auto,
+      named: true,
+    ),
+    e.field(
+      "term-column-width",
+      e.types.smart(e.types.union(length, ratio)),
+      default: auto,
+      named: true,
+    ),
+    e.field(
+      "debug",
+      bool,
+      default: false,
+      named: true,
+    ),
+  ),
+  allow-unknown-fields: true,
+  display: el => {
+    let (
+      body,
+      body-indent,
+      term-align,
+      term-column-width,
+      separator,
+      debug
+    ) = e.fields(el)
+
+    set terms(separator: separator)
+
+    show terms: it => {
+      layout(((width, height)) => {
+        let terms = ()
+        let term-widths = ()
+        let descs = ()
+
+        let cells = ()
+
+        for item in it.children {
+          let term = aligned-term(item.term)
+          let desc = item.description
+          term-widths.push(measure(term).width)
+          terms.push(term)
+          descs.push(desc)
+        }
+
+        let term-column-width = if type(term-column-width) == ratio {
+          width * term-column-width
+        } else if term-column-width == auto {
+          calc.max(..term-widths)
+        } else {
+          assert.eq(type(term-column-width), length)
+          term-column-width.to-absolute()
+        }
+
+        let result = for (term, desc, term-width) in terms.zip(descs, term-widths) {
+          let extra-width = term-width -term-column-width
+          cells.push(
+            box(term, width: width)
+          )
+          cells.push(
+            if extra-width > 0pt { h(extra-width) } +
+            it.separator +
+            desc
+          )
+        }
+
+        grid(
+          ..cells,
+          column-gutter: body-indent,
+          columns: (term-column-width, 1fr),
+          row-gutter: if (it.tight) {
+            par.leading
+          } else {
+            par.spacing
+          },
+          stroke: if (debug) {
+            debug-box-stroke
+          }
+        )
+      })
+    }
+    body
+  }
+)
+
+

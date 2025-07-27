@@ -1,6 +1,6 @@
 #import "@preview/elembic:1.1.1" as e
-#import "src/lib.typ" as bib-fox: custom-bib-refs, bib-list, bib-entries
-#import bib-fox.list: inline-list
+#import "src/lib.typ" as simpliste: inline-list
+#import simpliste.bib: custom-bib-refs, bib-list, bib-entries
 
 #show: custom-bib-refs
 #set par(justify: true)
@@ -15,7 +15,7 @@
   },
 )
 #show: e.show_(
-  bib-fox.ref.bib-backref,
+  simpliste.bib.bib-backref,
   it => {
     // use math font for the backref arrow symbol
     // The symbol is missing in text font

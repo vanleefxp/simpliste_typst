@@ -8,6 +8,24 @@
   (removed, m)
 }
 
+#let transpose(..args) = {
+  let arrs = args.pos()
+  if arrs.len() == 0 {
+    return ()
+  } else {
+    arrs.at(0).zip(..arrs.slice(1))
+  }
+}
+
+#let is-multi-line(content, width: auto) = {
+  if type(width) != length { false }
+  else {
+    let (height: h1) = measure(content, width: width)
+    let (height: h2) = measure(content)
+    return h1 > h2
+  }
+}
+
 #let space = [ ].func()
 
 #let is-empty-content(it) = {

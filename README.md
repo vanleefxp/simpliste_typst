@@ -1,6 +1,12 @@
-# Typst Package: `bib-fox`
+# Typst Package: `simpliste`
 
-`bib-fox` is a package that allows you to create customized bibliography display style as an alternative to Typst's default `bibliography` function. It gives you full access to every detail of how your bibliography is displayed. This package can be useful when your writing is not a journal essay and you just want to point your readers to some simple external materials and don't want to make it look too formal.
+`simplist` is a package that provides you with customized list styles.
+
+# Inline Numbered and Unnumbered Lists
+
+# `simpliste.bib`: Customized Bibliography Display Style
+
+The `bib` submodule of `simpliste` allows you to create customized bibliography display style as an alternative to Typst's default `bibliography` function. It gives you full access to every detail of how your bibliography is displayed. This package can be useful when your writing is not a journal essay and you just want to point your readers to some simple external materials and don't want to make it look too formal.
 
 With this package, you can use `ref` to reference your custom bibliography items, when the following `show` rule is applied:
 
@@ -9,4 +15,4 @@ With this package, you can use `ref` to reference your custom bibliography items
 #show: custom-bib-refs
 ```
 
-`bib-fox` provides two main bibliography formats: the `bib-list` which displays bibliography as a numbered list, and `bib-entries`, which displays different fields of a bibliography item in neatly-aligned columns.
+`simpliste.bib` provides two main bibliography formats: the `bib-list` which displays bibliography as a numbered list, and `bib-entries`, which displays different fields of a bibliography item in neatly-aligned columns.
