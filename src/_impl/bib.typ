@@ -325,7 +325,7 @@
     e.field(
       "debug",
       bool,
-      default: false,
+      default: true,
       named: true
     )
   ),
@@ -354,7 +354,7 @@
     let backref-col-min-width = 0pt
     if backref {
       for (i, label) in labels.enumerate()  {
-        let backref-count = counter("__bib-" + "_" + str(label)).get().at(0)
+        let backref-count = counter(backref-counter-name-prefix + "_" + str(label)).get().at(0)
         if backref-count > 0 {
           let backref-content = range(backref-count)
             .map(j => bib-backref(label, j))
@@ -419,7 +419,7 @@
       columns: if has-backref-col {
         (auto,) * n-columns + (1fr, backref-col-min-width)
       } else {
-        (auto,) * (n-columns + 1)
+        (auto,) * n-columns + (1fr,)
       },
       row-gutter: par.leading,
       column-gutter: (body-indent,) + column-gutter + (0pt,),
