@@ -325,7 +325,7 @@
     e.field(
       "debug",
       bool,
-      default: true,
+      default: false,
       named: true
     )
   ),
