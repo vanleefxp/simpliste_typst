@@ -1,6 +1,6 @@
 #import "@preview/elembic:1.1.1" as e
 #import "./list.typ": inline-list
-#import "./utils.typ": dict-sep, is-empty-content
+#import "./utils.typ": dict-sep, is-empty-content, content2str
 #import "./init.typ": debug-box-stroke
 
 #let space = [ ].func()
@@ -27,6 +27,7 @@
       value.insert(label, true)
       value
     })
+    sym.zwj
     std.numbering(numbering, ..e.counter(el).get())
   },
 )
@@ -168,13 +169,9 @@
     let (bib-number-args, args) = dict-sep(args, "numbering")
 
     let terms-items = body.children.filter(
-      it => (
-        it.func() == terms.item and
-        type(it.term) == content and
-        it.term.func() == text
-      )
+      it => it.func() == terms.item
     )
-    let labels = terms-items.map(it => label(it.term.text))
+    let labels = terms-items.map(it => label(content2str(it.term)))
     let enum-items = terms-items.zip(labels).enumerate().map(
       ((i, (terms-item, label))) => {
         enum.item(
@@ -332,15 +329,16 @@
   allow-unknown-fields: true,
   display: el => {
     let (body, align, number-align, body-indent, column-gutter, backref, backref-prefix, backref-sep, debug) = e.fields(el)
-    assert.eq(body.func(), sequence)
-    let terms-items = body.children.filter(
-      it => (
-        it.func() == terms.item and
-        type(it.term) == content and
-        it.term.func() == text
-      )
-    )
-    let labels = terms-items.map(it => label(it.term.text))
+    // assert.eq(body.func(), sequence)
+    let terms-items = if body.func() == sequence {
+      body.children
+      .filter(it => it.func() == terms.item)
+    } else if body.func() == terms.item {
+      (body,)
+    } else {
+      panic("Unsupported content type")
+    }
+    let labels = terms-items.map(it => label(content2str(it.term)))
     let items = terms-items.map(it => {
       let desc = it.description
       if desc.func() == sequence {

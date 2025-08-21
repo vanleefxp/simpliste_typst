@@ -1,3 +1,7 @@
+#let space = [ ].func()
+#let sequence = [a_b].func()
+#let context_ = (context {}).func()
+
 #let dict-sep(m, ..args, ignore-non-exist: true) = {
   let removed = (:)
   let keys-to-remove = args.pos()
@@ -26,7 +30,21 @@
   }
 }
 
-#let space = [ ].func()
+
+#let content2str(body) = {
+  assert.eq(type(body), content)
+  if body.has("text") {
+    body.text
+  } else if body.has("children") {
+    body.children.map(content2str).join()
+  } else if body.has("body") {
+    content2str(body.body)
+  } else if body.func() == space {
+    " "
+  } else {
+    panic("Cannot convert `" + [#body.func()].text + "` to string")
+  }
+}
 
 #let is-empty-content(it) = {
   (
